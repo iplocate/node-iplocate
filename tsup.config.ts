@@ -34,6 +34,17 @@ export default defineConfig([
   // Type definitions
   {
     entry: ['src/index.ts'],
+    format: ['cjs'],
+    outDir: 'dist/types',
+    dts: {
+      only: true,
+    },
+    clean: true,
+    target: 'es2020',
+    platform: 'node',
+  },
+  {
+    entry: ['src/index.ts'],
     format: ['esm'],
     outDir: 'dist/types',
     dts: {
