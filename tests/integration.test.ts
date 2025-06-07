@@ -5,11 +5,13 @@ import {
 
 const LIVE_API_KEY = process.env.IPLOCATE_API_KEY;
 
-describe('IPLocate Integration Tests', () => {
+const describeIntegration = LIVE_API_KEY ? describe : describe.skip;
+
+describeIntegration('IPLocate Integration Tests', () => {
   let client: IPLocate;
 
   beforeAll(() => {
-    client = new IPLocate(LIVE_API_KEY ?? 'integration-test');
+    client = new IPLocate(LIVE_API_KEY ?? '');
   });
 
   describe('Live API calls', () => {
@@ -100,3 +102,8 @@ describe('IPLocate Integration Tests', () => {
     }, 10000);
   });
 });
+
+if (!LIVE_API_KEY) {
+  console.log('Integration tests skipped. Set IPLOCATE_API_KEY environment variable to run them.');
+  console.log('Example: IPLOCATE_API_KEY=your_key_here yarn test integration.test.ts\n');
+}
