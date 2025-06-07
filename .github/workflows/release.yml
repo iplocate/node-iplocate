@@ -28,6 +28,8 @@ jobs:
 
       - name: Run full test suite
         run: yarn test:coverage
+        env:
+          IPLOCATE_API_KEY: ${{ secrets.IPLOCATE_API_KEY }}
 
       - name: Build package
         run: yarn build
@@ -58,3 +60,4 @@ jobs:
         run: yarn publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          IPLOCATE_API_KEY: ${{ secrets.IPLOCATE_API_KEY }}

@@ -104,8 +104,12 @@ jobs:
         run: |
           cd examples
           npx tsx typescript-usage.ts --dry-run || echo "Example validation (expected to fail without API key)"
+        env:
+          IPLOCATE_API_KEY: ${{ secrets.IPLOCATE_API_KEY }}
 
       - name: Test JavaScript example
         run: |
           cd examples
           node basic-usage.js --dry-run || echo "Example validation (expected to fail without API key)"
+        env:
+          IPLOCATE_API_KEY: ${{ secrets.IPLOCATE_API_KEY }}
