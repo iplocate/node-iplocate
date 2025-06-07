@@ -78,7 +78,7 @@ export default class IPLocate {
         ...this.httpClientOptions,
         headers: {
           'Accept': 'application/json',
-          'User-Agent': 'node-iplocate/2.0.0',
+          'User-Agent': 'node-iplocate/2.0.1',
           ...this.httpClientOptions.headers,
         },
         signal: controller.signal,

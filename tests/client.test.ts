@@ -115,7 +115,7 @@ describe('IPLocate Client', () => {
           method: 'GET',
           headers: expect.objectContaining({
             'Accept': 'application/json',
-            'User-Agent': 'node-iplocate/2.0.0',
+            'User-Agent': 'node-iplocate/2.0.1',
           }),
         })
       );
@@ -313,7 +313,7 @@ describe('IPLocate Client', () => {
         expect.objectContaining({
           'Custom-Header': 'test-value',
           'Accept': 'application/json',
-          'User-Agent': 'node-iplocate/2.0.0',
+          'User-Agent': 'node-iplocate/2.0.1',
         })
       );
     });
