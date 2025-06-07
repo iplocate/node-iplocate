@@ -1,139 +1,302 @@
-# IPLocate for Node.js
+# IPLocate - IP address geolocation and threat detection
 
-[![NPM Package Version][npm-package-version-badge]][npm-package-url]
-[![NPM Package License][npm-package-license-badge]][npm-package-license-url]
-[![NPM Package Downloads][npm-package-downloads-badge]][npm-package-url]
+[![npm version](https://img.shields.io/npm/v/node-iplocate.svg?style=flat-square)](https://npmjs.org/package/node-iplocate)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg?style=flat-square)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![npm downloads](https://img.shields.io/npm/dm/node-iplocate.svg?style=flat-square)](https://npmjs.org/package/node-iplocate)
 
-Look up details about an IP address using the free [IPLocate.io](https://www.iplocate.io) API:
+A Javascript/Typescript client for the [IPLocate.io](https://iplocate.io) geolocation API. Look up detailed geolocation and threat intelligence data for any IP address:
 
-* [IP geolocation data](https://www.iplocate.io/docs#data-base-data) (IP to city, IP to country, IP to region, postal code, latitude, and longitude)
-* [ASN details](https://www.iplocate.io/docs#data-asn-data) (ISP or network operator, associated domain name, and type, such as business, hosting, or company)
-* [Privacy & threat data](https://www.iplocate.io/docs#data-privacy-data) (VPN detection, proxy detection, iCloud Private Relay detection, spam and abuser detection)
-* [Company data](https://www.iplocate.io/docs#data-company-data) (the name and domain of the business that uses the IP address)
+- **IP geolocation**: IP to country, IP to city, IP to region/state, coordinates, timezone, postal code
+- **ASN information**: Internet service provider, network details, routing information  
+- **Privacy & threat detection**: VPN, proxy, Tor, hosting provider detection
+- **Company information**: Business details associated with IP addresses - company name, domain, type (ISP/hosting/education/government/business)
+- **Abuse contact**: Network abuse reporting information
+- **Hosting detection**: Cloud provider and hosting service detection using our proprietary hosting detection engine
 
-See what information we can provide for [your IP address](https://www.iplocate.io/what-is-my-ip).
+See what information we can provide for [your IP address](https://iplocate.io/what-is-my-ip).
 
-IPLocate.io provides 1,000 free requests per day with a [free account](https://iplocate.io/signup). For higher plans and access to more data, check out [API pricing](https://www.iplocate.io/pricing).
+## Getting started
 
-## Installation
+You can make 1,000 free requests per day with a [free account](https://iplocate.io/signup). For higher plans, check out [API pricing](https://www.iplocate.io/pricing).
 
-`npm install node-iplocate`
+### Installation
 
-## Usage Example
-
-```javascript
-const iplocate = require("node-iplocate");
-
-iplocate("123.243.246.200").then(function(results) {
-  console.log("IP Address: " + results.ip);
-  console.log("Country: " + results.country + " (" + results.country_code + ")");
-  console.log("Continent: " + results.continent);
-
-  console.log(JSON.stringify(results, null, 2));
-});
-
-// Without an API key you can make 50 free requests per day.
-// With a free API key from IPLocate.io, you can make 1,000 requests per day.
-iplocate("123.243.246.200", { api_key: "abcdef" }).then(function(results) {
-  // ...
-});
+```bash
+yarn add node-iplocate
+# or
+npm install node-iplocate
+# or
+pnpm add node-iplocate
 ```
 
-***
+### Quick start
 
 ```javascript
-IP Address: 123.243.246.200
-Country: Australia (AU)
-Continent: Australia
+import IPLocate from 'node-iplocate';
+// or: const IPLocate = require('node-iplocate').default;
 
-{
-  "ip": "123.243.246.200",
-  "country": "Australia",
-  "country_code": "AU",
-  "is_eu": false,
-  "city": "Sydney",
-  "continent": "Oceania",
-  "latitude": -33.8672,
-  "longitude": 151.1997,
-  "time_zone": "Australia/Sydney",
-  "postal_code": "2049",
-  "subdivision": "New South Wales",
-  "subdivision2": null,
-  "network": "123.243.240.0/20",
-  "asn": {
-    "asn": "AS7545",
-    "route": "123.243.246.0/24",
-    "netname": "TPG-INTERNET-AP",
-    "name": "TPG Telecom Limited",
-    "country_code": "AU",
-    "domain": "tpgtelecom.com.au",
-    "type": "isp",
-    "rir": "APNIC"
-  },
-  "privacy": {
-    "is_abuser": false,
-    "is_anonymous": false,
-    "is_bogon": false,
-    "is_datacenter": false,
-    "is_icloud_relay": false,
-    "is_proxy": false,
-    "is_tor": false,
-    "is_vpn": false
-  },
-  "company": {
-    "name": "TPG Telecom",
-    "domain": "www.tpgtelecom.com.au",
-    "country_code": "AU",
-    "type": "isp"
-  },
-  "abuse": {
-    "address": "TPG Internet Pty Ltd., (Part of the Total Peripherals Group), 65 Waterloo Road, North Ryde NSW 2113",
-    "email": "hostmaster@tpgtelecom.com.au",
-    "name": "ABUSE TPGCOMAU",
-    "network": "123.243.246.192 - 123.243.246.223",
-    "phone": "+000000000"
-  }
+// Create a client with your API key
+// Get your free API key from https://iplocate.io/signup
+const client = new IPLocate('your-api-key');
+
+// Look up an IP address
+const result = await client.lookup('8.8.8.8');
+
+console.log(`IP: ${result.ip}`);
+if (result.country) {
+    console.log(`Country: ${result.country}`);
+}
+if (result.city) {
+    console.log(`City: ${result.city}`);
+}
+
+// Check privacy flags
+console.log(`Is VPN: ${result.privacy.is_vpn}`);
+console.log(`Is Proxy: ${result.privacy.is_proxy}`);
+```
+
+### Get your own IP address information
+
+```typescript
+// Look up your own IP address (no IP parameter)
+const result = await client.lookupSelf();
+console.log(`Your IP: ${result.ip}`);
+```
+
+### Get the country for an IP address
+
+```typescript
+const result = await client.lookup('203.0.113.1');
+console.log(`Country: ${result.country} (${result.country_code})`);
+```
+
+### Get the currency code for a country by IP address
+
+```typescript
+const result = await client.lookup('203.0.113.1');
+console.log(`Currency: ${result.currency_code}`);
+```
+
+### Get the calling code for a country by IP address
+
+```typescript
+const result = await client.lookup('203.0.113.1');
+console.log(`Calling code: +${result.calling_code}`);
+```
+
+## Authentication
+
+Get your free API key from [IPLocate.io](https://iplocate.io/signup), and pass it when creating the client:
+
+```typescript
+const client = new IPLocate('your-api-key');
+```
+
+## Examples
+
+### IP address geolocation lookup
+
+```typescript
+import IPLocate from 'node-iplocate';
+
+const client = new IPLocate('your-api-key');
+const result = await client.lookup('203.0.113.1');
+
+console.log(`Country: ${result.country} (${result.country_code})`);
+if (result.latitude && result.longitude) {
+    console.log(`Coordinates: ${result.latitude}, ${result.longitude}`);
 }
 ```
 
-## Tests
+### Check for VPN/Proxy Detection
 
-To run the test suite, first install the dependencies, then run `npm test`:
+```typescript
+const result = await client.lookup('192.0.2.1');
+
+if (result.privacy.is_vpn) {
+    console.log('This IP is using a VPN');
+}
+
+if (result.privacy.is_proxy) {
+    console.log('This IP is using a proxy');
+}
+
+if (result.privacy.is_tor) {
+    console.log('This IP is using Tor');
+}
+```
+
+### ASN and network information
+
+```typescript
+const result = await client.lookup('8.8.8.8');
+
+if (result.asn) {
+    console.log(`ASN: ${result.asn.asn}`);
+    console.log(`ISP: ${result.asn.name}`);
+    console.log(`Network: ${result.asn.route}`);
+}
+```
+
+### Custom configuration
+
+```typescript
+import IPLocate from 'node-iplocate';
+
+// Custom timeout and HTTP options
+const client = new IPLocate('your-api-key', {
+    timeout: 60000, // 60 seconds
+    baseUrl: 'https://custom-endpoint.com/api', // For enterprise customers
+    httpClientOptions: {
+        headers: {
+            'Custom-Header': 'value'
+        }
+    }
+});
+```
+
+## Response structure
+
+The `LookupResponse` interface contains all available data:
+
+```typescript
+interface LookupResponse {
+    ip: string;
+    country?: string;
+    country_code?: string;
+    is_eu: boolean;
+    city?: string;
+    continent?: string;
+    latitude?: number;
+    longitude?: number;
+    time_zone?: string;
+    postal_code?: string;
+    subdivision?: string;
+    currency_code?: string;
+    calling_code?: string;
+    network?: string;
+    asn?: ASN;
+    privacy: Privacy;
+    company?: Company;
+    hosting?: Hosting;
+    abuse?: Abuse;
+}
+```
+
+### TypeScript support
+
+All types are exported for use in your TypeScript projects:
+
+```typescript
+import IPLocate, { 
+    LookupResponse, 
+    ASN, 
+    Privacy, 
+    Company, 
+    Hosting, 
+    Abuse,
+    IPLocateOptions 
+} from 'node-iplocate';
+```
+
+## Error handling
+
+The library provides typed error classes for different scenarios:
+
+```typescript
+import IPLocate, {
+    InvalidIPError,
+    AuthenticationError,
+    NotFoundError,
+    RateLimitError,
+    APIError
+} from 'node-iplocate';
+
+const client = new IPLocate('your-api-key');
+
+try {
+    const result = await client.lookup('8.8.8.8');
+    console.log(result);
+} catch (error) {
+    if (error instanceof InvalidIPError) {
+        console.log('Invalid IP address format');
+    } else if (error instanceof AuthenticationError) {
+        console.log('Invalid API key');
+    } else if (error instanceof NotFoundError) {
+        console.log('IP address not found');
+    } else if (error instanceof RateLimitError) {
+        console.log('Rate limit exceeded');
+    } else if (error instanceof APIError) {
+        console.log(`API error (${error.statusCode}): ${error.message}`);
+    } else {
+        console.log('Unknown error:', error);
+    }
+}
+```
+
+Common API errors:
+
+- `InvalidIPError`: Invalid IP address format (HTTP 400)
+- `AuthenticationError`: Invalid API key (HTTP 403)
+- `NotFoundError`: IP address not found (HTTP 404)
+- `RateLimitError`: Rate limit exceeded (HTTP 429)
+- `APIError`: Other API errors (HTTP 500, etc.)
+
+## API reference
+
+For complete API documentation, visit [iplocate.io/docs](https://iplocate.io/docs).
+
+## Development
+
+### Install dependencies
 
 ```bash
-$ npm install
-$ npm test
+yarn install
+```
+
+### Run tests
+
+```bash
+yarn test
+```
+
+### Run tests with coverage
+
+```bash
+yarn test:coverage
+```
+
+### Build the library
+
+```bash
+yarn build
+```
+
+### Type checking
+
+```bash
+yarn type-check
+```
+
+### Linting
+
+```bash
+yarn lint
+yarn lint:fix
 ```
 
 ## License
 
-Distributed under the [MIT License](LICENSE).
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-[npm-package-url]: https://npmjs.org/package/node-iplocate
+## About IPLocate.io
 
-[npm-package-version-badge]: https://img.shields.io/npm/v/node-iplocate.svg?style=flat-square
+Since 2017, IPLocate has set out to provide the most reliable and accurate IP address data.
 
-[npm-package-license-badge]: https://img.shields.io/npm/l/node-iplocate.svg?style=flat-square
-[npm-package-license-url]: http://opensource.org/licenses/MIT
+We process 50TB+ of data to produce our comprehensive IP geolocation, IP to company, proxy and VPN detection, hosting detection, ASN, and WHOIS data sets. Our API handles over 15 billion requests a month for thousands of businesses and developers.
 
-[npm-package-downloads-badge]: https://img.shields.io/npm/dm/node-iplocate.svg?style=flat-square
-
-[devDependencies-status-badge]: https://david-dm.org/tallytarik/node-iplocate/dev-status.svg?style=flat-square
-[devDependencies-status-page-url]: https://david-dm.org/tallytarik/node-iplocate#info=devDependencies
-
-[node-version-badge]: https://img.shields.io/node/v/node-iplocate.svg?style=flat-square
-[node-downloads-page-url]: https://nodejs.org/en/download/
-
-[travis-ci-build-status-badge]: https://img.shields.io/travis/tallytarik/node-iplocate.svg?style=flat-square
-[travis-ci-build-status-page-url]: https://travis-ci.org/tallytarik/node-iplocate
-
-[code-climate-status-badge]: https://img.shields.io/codeclimate/github/tallytarik/node-iplocate.svg?style=flat-square
-[code-climate-status-page-url]: https://codeclimate.com/github/tallytarik/node-iplocate
-
-[code-climate-test-coverage-status-badge]: https://img.shields.io/codeclimate/coverage/github/tallytarik/node-iplocate.svg?style=flat-square
-[code-climate-test-coverage-status-page-url]: https://codeclimate.com/github/tallytarik/node-iplocate/coverage
-
-[inch-ci-documentation-coverage-status-badge]: https://inch-ci.org/github/tallytarik/node-iplocate.svg?style=flat-square
-[inch-ci-documentation-coverage-status-page-url]: https://inch-ci.org/github/tallytarik/node-iplocate
-
-[npm-package-statistics-badge]: https://nodei.co/npm/node-iplocate.png?downloads=true&downloadRank=true&stars=true
+- Email: [support@iplocate.io](mailto:support@iplocate.io)
+- Website: [iplocate.io](https://iplocate.io)
+- Documentation: [iplocate.io/docs](https://iplocate.io/docs)
+- Sign up for a free API Key: [iplocate.io/signup](https://iplocate.io/signup)
